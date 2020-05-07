@@ -45,10 +45,29 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 30.0),
-                    child: RaisedButton(
-                      color: Colors.blue[300],
-                      onPressed: (){ game.setTotalPoints(); },
-                      child: Text("Calculate Round"),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Center(
+                            child: RaisedButton(
+                              color: Colors.blue[300],
+                              onPressed: (){ game.setTotalPoints(false); },
+                              child: Text("Calculate Round"),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: RaisedButton(
+                              color: Colors.yellow[300],
+                              onPressed: game.history.isNotEmpty
+                                  ? (){ game.setTotalPoints(true); }
+                                  : null,
+                              child: Text("Edit Last Round"),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   Container(

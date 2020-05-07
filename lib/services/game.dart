@@ -69,15 +69,32 @@ class Game extends PropertyChangeNotifier<String>{
 
   dynamic getRoundState(String team, String key) => _roundState[team][key];
 
-  void setTotalPoints(){
-    _totalPoints["Team 1"] += _calculateRoundPoints('Team 1');
-    _totalPoints["Team 2"] += _calculateRoundPoints('Team 2');
+  void setTotalPoints(bool edit){
 
-    _history.add({
-      "Team 1": _calculateRoundPoints('Team 1'),
-      "Team 2": _calculateRoundPoints('Team 2'),
-      "Round" : _history.length + 1,
-    });
+
+    if(edit){
+      _totalPoints["Team 1"] -= _history.last["Team 1"];
+      _totalPoints["Team 2"] -= _history.last["Team 2"];
+
+      _totalPoints["Team 1"] += _calculateRoundPoints('Team 1', 'Team 2');
+      _totalPoints["Team 2"] += _calculateRoundPoints('Team 2', 'Team 1');
+
+      _history.last = {
+        "Team 1": _calculateRoundPoints('Team 1', 'Team 2'),
+        "Team 2": _calculateRoundPoints('Team 2', 'Team 1'),
+        "Round" : _history.length,
+      };
+    }
+    else{
+      _totalPoints["Team 1"] += _calculateRoundPoints('Team 1', 'Team 2');
+      _totalPoints["Team 2"] += _calculateRoundPoints('Team 2', 'Team 1');
+
+      _history.add({
+        "Team 1": _calculateRoundPoints('Team 1', 'Team 2'),
+        "Team 2": _calculateRoundPoints('Team 2', 'Team 1'),
+        "Round" : _history.length + 1,
+      });
+    }
 
     _roundState = {
       "Team 1": {
@@ -103,14 +120,16 @@ class Game extends PropertyChangeNotifier<String>{
 
   int getTotalPoints(String team) => _totalPoints[team];
 
-  int _calculateRoundPoints(String team){
+  int _calculateRoundPoints(String team, String enemyTeam){
     int points = 0;
 
     if(_roundState[team]["1-2"]){
       points += 200;
     }
     else{
-      points += _roundState[team]["Points"];
+      if(!_roundState[enemyTeam]["1-2"]){
+        points += _roundState[team]["Points"];
+      }
     }
 
     if(_roundState[team]["Tichu"]){
