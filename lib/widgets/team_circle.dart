@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tichucounter/services/game.dart';
+import 'package:tichucounter/services/utils.dart';
 import 'package:tichucounter/widgets/circle_button.dart';
 
 class TeamCircle extends StatefulWidget {
@@ -16,7 +17,7 @@ class TeamCircle extends StatefulWidget {
 class _TeamCircleState extends State<TeamCircle> {
   final Game game = Game();
   final FixedExtentScrollController scrollController = FixedExtentScrollController(
-    initialItem: 10
+    initialItem: 15
   );
 
   @override
@@ -29,7 +30,7 @@ class _TeamCircleState extends State<TeamCircle> {
         int points = 100 - game.getRoundState(widget.enemyTeam, 'Points');
 
         scrollController.animateToItem(
-          (points/5).floor(),
+          Utils.pointsToIndex(points),
           duration: Duration(milliseconds: 100),
           curve: Curves.linear,
         );
@@ -174,18 +175,19 @@ class _TeamCircleState extends State<TeamCircle> {
               controller: scrollController,
               itemExtent: size / 2,
               diameterRatio: 1.2,
-              onSelectedItemChanged: (value){
-                if(value*5 != game.getRoundState(widget.team, "Points")){
-                  game.setRoundState(widget.team, "Points", value*5);
+              onSelectedItemChanged: (index){
+                int points = Utils.indexToPoints(index);
+                if(points != game.getRoundState(widget.team, "Points")){
+                  game.setRoundState(widget.team, "Points", points);
                 }
               },
-              children: List.generate(21, (index) => index*5).map((number){
+              children: List.generate(31, (index) => Utils.indexToPoints(index)).map((number){
                 return Center(
                   child: Text(number.toString(),
                     style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
                   ),
                 );
-              }).toList(),
+              },).toList(),
             ),
           ),
         ),
