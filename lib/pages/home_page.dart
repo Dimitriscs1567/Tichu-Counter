@@ -186,14 +186,14 @@ class _HomePageState extends State<HomePage> {
         elevation: 25.0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       ),
-      barrierDismissible: false,
+      barrierDismissible: true,
     ).then((value){
       if(value){
         setState(() {
           data.newGame();
         });
       }
-    });
+    }).catchError((error){ return null; });
   }
 
   void changeNameDialog(int team){

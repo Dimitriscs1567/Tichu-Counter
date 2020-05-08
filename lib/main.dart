@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tichucounter/pages/home_page.dart';
 
-void main() => runApp(MyApp());
+void main(){
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).whenComplete((){
+    runApp(MyApp());
+  });
+}
 
 class MyApp extends StatelessWidget {
   @override
