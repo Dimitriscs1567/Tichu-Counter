@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tichucounter/services/game.dart';
+import 'package:tichucounter/services/data.dart';
+import 'package:tichucounter/widgets/round_as_text.dart';
 import 'package:tichucounter/widgets/team_circle.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,11 +9,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final Game game = Game();
+  final Data data = Data();
+  final TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
-    game.addListener((){
+    data.addListener((){
       setState(() {});
     }, ["TotalPoints"]);
 
@@ -31,7 +33,12 @@ class _HomePageState extends State<HomePage> {
         children: <Widget>[
           Expanded(
             flex: 1,
-            child: _teamsInfo(),
+            child: Row(
+              children: <Widget>[
+                _teamsInfo(1),
+                _teamsInfo(2),
+              ],
+            ),
           ),
           Expanded(
             flex: 2,
@@ -45,30 +52,7 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 30.0),
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Center(
-                            child: RaisedButton(
-                              color: Colors.blue[300],
-                              onPressed: (){ game.setTotalPoints(false); },
-                              child: Text("Calculate Round"),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Center(
-                            child: RaisedButton(
-                              color: Colors.yellow[300],
-                              onPressed: game.history.isNotEmpty
-                                  ? (){ game.setTotalPoints(true); }
-                                  : null,
-                              child: Text("Edit Last Round"),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                    child: _buttonRow(),
                   ),
                   Container(
                     margin: const EdgeInsets.only(bottom: 10.0),
@@ -77,47 +61,7 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(fontSize: 22.0),
                     ),
                   ),
-                  Expanded(
-                    child: ListView(
-                      children: game.history.reversed.map((round){
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
-                          child: Row(
-                            children: <Widget>[
-                              RichText(
-                                text: round["Round"] < 10 ? TextSpan(
-                                  text:'0',
-                                  style: TextStyle(fontSize: 20.0, color: Colors.white.withOpacity(0.0)),
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: round["Round"].toString() + '.',
-                                      style: TextStyle(fontSize: 20.0, color: Colors.black),
-                                    ),
-                                  ],
-                                ):
-                                TextSpan(
-                                  text: round["Round"].toString() + '.',
-                                  style: TextStyle(fontSize: 20.0, color: Colors.black),
-                                ) ,
-                              ),
-                              Expanded(
-                                child: Text(round["Team 1"].toString(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                              ),
-                              Expanded(
-                                child: Text(round["Team 2"].toString(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 20.0),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },).toList(),
-                    ),
-                  ),
+                  _history(),
                 ],
               ),
             ),
@@ -127,52 +71,32 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _teamsInfo(){
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Team 1',
-                style: TextStyle(
-                  fontSize: 26.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
+  Widget _teamsInfo(int teamNumber){
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          GestureDetector(
+            onTap: (){ changeNameDialog(teamNumber); },
+            child: Text(teamNumber == 1 ? data.game.team1Name : data.game.team2Name,
+              style: TextStyle(
+                fontSize: 26.0,
+                fontWeight: FontWeight.bold,
               ),
-              Text(game.getTotalPoints("Team 1").toString(),
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+              textAlign: TextAlign.center,
+            ),
           ),
-        ),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text('Team 2',
-                style: TextStyle(
-                  fontSize: 26.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Text(game.getTotalPoints("Team 2").toString(),
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+          Text( teamNumber == 1
+              ? data.game.totalPoints[data.game.team1Name].toString()
+              : data.game.totalPoints[data.game.team2Name].toString(),
+            style: TextStyle(
+              fontSize: 24.0,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
           ),
-        )
-      ],
+        ],
+      ),
     );
   }
 
@@ -182,17 +106,129 @@ class _HomePageState extends State<HomePage> {
       children: <Widget>[
         Expanded(
           child: TeamCircle(
-            team: "Team 1",
-            enemyTeam: "Team 2",
+            team: 1,
+            enemyTeam: 2,
           ),
         ),
         Expanded(
           child: TeamCircle(
-            team: "Team 2",
-            enemyTeam: "Team 1",
+            team: 2,
+            enemyTeam: 1,
           ),
         ),
       ],
     );
+  }
+
+  Widget _history() {
+    return Expanded(
+      child: ListView(
+        children: data.game.getHistoryRounds().reversed.map((round){
+          return RoundAsText(round: round,);
+        },).toList(),
+      ),
+    );
+  }
+
+  Widget _buttonRow() {
+    return Row(
+      children: <Widget>[
+        Container(
+          width: MediaQuery.of(context).size.width / 3,
+          child: RaisedButton(
+            color: Colors.blue[300],
+            onPressed: (){ data.setTotalPoints(false); },
+            child: Text("Calculate Round",
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width / 3,
+          child: RaisedButton(
+            color: Colors.yellow[300],
+            onPressed: data.game.rounds.length > 1
+                ? (){ data.setTotalPoints(true); }
+                : null,
+            child: Text("Edit Last Round",
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+        Container(
+          width: MediaQuery.of(context).size.width / 3,
+          child: RaisedButton(
+            color: Colors.red[300],
+            onPressed: (){ newGameDialog(); },
+            child: Text("New Game"),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void newGameDialog(){
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Start a new game"),
+        content: Text("Are you sure you want to start a new game?"),
+        actions: <Widget>[
+          FlatButton(
+            child: Text("No"),
+            onPressed: (){Navigator.pop(context, false);},
+          ),
+          FlatButton(
+            child: Text("Yes"),
+            onPressed: (){Navigator.pop(context, true);},
+          ),
+        ],
+        elevation: 25.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      ),
+      barrierDismissible: false,
+    ).then((value){
+      if(value){
+        setState(() {
+          data.newGame();
+        });
+      }
+    });
+  }
+
+  void changeNameDialog(int team){
+    nameController.text = team == 1 ? data.game.team1Name : data.game.team2Name;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(team == 1 ? "Change first team's name" : "Change second team's name"),
+        content: TextFormField(
+          controller: nameController,
+          keyboardType: TextInputType.text,
+          decoration: InputDecoration(
+            labelText: "Team $team name",
+            labelStyle: TextStyle(
+              fontSize: 20.0,
+            ),
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text("Save"),
+            onPressed: (){Navigator.pop(context, nameController.text);},
+          ),
+        ],
+        elevation: 25.0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      ),
+      barrierDismissible: true,
+    ).then((value){
+      if(value.trim().isNotEmpty){
+        setState(() {
+          data.game.setNewTeamName(team, value);
+        });
+      }
+    }).catchError((error){ return null; });
   }
 }

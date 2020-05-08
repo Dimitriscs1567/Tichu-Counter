@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tichucounter/services/game.dart';
+import 'package:tichucounter/services/data.dart';
 
 class CircleButton extends StatelessWidget {
-  final Game game = Game();
+  final Data data = Data();
   final Color color;
   final BorderRadius borderRadius;
   final String text;
   final bool horizontal;
-  final String team;
+  final int team;
   bool selected;
   String position;
 
@@ -23,7 +23,7 @@ class CircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    selected = game.getRoundState(team, text);
+    selected = data.game.getCurrentRound().getRoundState(team, text);
     double angle = 0.8;
     Offset offset;
     double offsetValue = MediaQuery.of(context).size.width / 15;
@@ -49,7 +49,7 @@ class CircleButton extends StatelessWidget {
 
     return GestureDetector(
       onTap: (){
-        game.setRoundState(team, text, !selected);
+        data.setRoundState(team, text, !selected);
       },
       child: Opacity(
         opacity: selected ? 1.0 : 0.3,

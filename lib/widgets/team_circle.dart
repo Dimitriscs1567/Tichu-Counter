@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:tichucounter/services/game.dart';
+import 'package:tichucounter/services/data.dart';
 import 'package:tichucounter/services/utils.dart';
 import 'package:tichucounter/widgets/circle_button.dart';
 
 class TeamCircle extends StatefulWidget {
 
-  final String team;
-  final String enemyTeam;
+  final int team;
+  final int enemyTeam;
 
   TeamCircle({@required this.team, @required this.enemyTeam});
 
@@ -15,7 +15,7 @@ class TeamCircle extends StatefulWidget {
 }
 
 class _TeamCircleState extends State<TeamCircle> {
-  final Game game = Game();
+  final Data data = Data();
   final FixedExtentScrollController scrollController = FixedExtentScrollController(
     initialItem: 15
   );
@@ -23,11 +23,11 @@ class _TeamCircleState extends State<TeamCircle> {
   @override
   void initState() {
 
-    game.addListener((String property){
-      bool onEnemy = property.contains(widget.enemyTeam);
+    data.addListener((String property){
+      bool onEnemy = property.contains("Team${widget.enemyTeam}");
 
       if(property.contains("Points") && onEnemy){
-        int points = 100 - game.getRoundState(widget.enemyTeam, 'Points');
+        int points = 100 - data.game.getCurrentRound().getRoundState(widget.enemyTeam, 'Points');
 
         scrollController.animateToItem(
           Utils.pointsToIndex(points),
@@ -177,8 +177,8 @@ class _TeamCircleState extends State<TeamCircle> {
               diameterRatio: 1.2,
               onSelectedItemChanged: (index){
                 int points = Utils.indexToPoints(index);
-                if(points != game.getRoundState(widget.team, "Points")){
-                  game.setRoundState(widget.team, "Points", points);
+                if(points != data.game.getCurrentRound().getRoundState(widget.team, "Points")){
+                  data.setRoundState(widget.team, "Points", points);
                 }
               },
               children: List.generate(31, (index) => Utils.indexToPoints(index)).map((number){
