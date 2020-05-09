@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tichucounter/services/data.dart';
+import 'package:tichucounter/services/storage.dart';
 import 'package:tichucounter/widgets/round_as_text.dart';
 import 'package:tichucounter/widgets/team_circle.dart';
 
@@ -11,12 +12,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Data data = Data();
   final TextEditingController nameController = TextEditingController();
+  final key = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     data.addListener((){
       setState(() {});
-    }, ["TotalPoints"]);
+    }, ["TotalPoints Team1 Team2 Points"]);
 
     super.initState();
   }
@@ -25,8 +27,27 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      key: key,
       appBar: AppBar(
         title: Text('Tichu Counter'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.save),
+            iconSize: 25.0,
+            onPressed: (){
+              Storage.storeGame(data.game).whenComplete((){
+                Storage.fetchGame().then((game){
+                  print(game.toMap()["totalPoints"].toString());
+                });
+                key.currentState.showSnackBar(SnackBar(
+                  elevation: 10.0,
+                  content: Text("Game Saved"),
+                  duration: Duration(seconds: 3),
+                ));
+              });
+            },
+          )
+        ],
         centerTitle: true,
       ),
       body: Column(
@@ -51,7 +72,7 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 children: <Widget>[
                   Container(
-                    margin: const EdgeInsets.symmetric(vertical: 30.0),
+                    margin: const EdgeInsets.symmetric(vertical: 20.0),
                     child: _buttonRow(),
                   ),
                   Container(
@@ -134,33 +155,41 @@ class _HomePageState extends State<HomePage> {
     return Row(
       children: <Widget>[
         Container(
+          height: MediaQuery.of(context).size.height / 16,
           width: MediaQuery.of(context).size.width / 3,
           child: RaisedButton(
             color: Colors.blue[300],
             onPressed: (){ data.setTotalPoints(false); },
             child: Text("Calculate Round",
+              style: TextStyle(fontSize: 20.0),
               textAlign: TextAlign.center,
             ),
           ),
         ),
         Container(
           width: MediaQuery.of(context).size.width / 3,
+          height: MediaQuery.of(context).size.height / 16,
           child: RaisedButton(
             color: Colors.yellow[300],
             onPressed: data.game.rounds.length > 1
                 ? (){ data.setTotalPoints(true); }
                 : null,
             child: Text("Edit Last Round",
+              style: TextStyle(fontSize: 20.0),
               textAlign: TextAlign.center,
             ),
           ),
         ),
         Container(
           width: MediaQuery.of(context).size.width / 3,
+          height: MediaQuery.of(context).size.height / 16,
           child: RaisedButton(
             color: Colors.red[300],
             onPressed: (){ newGameDialog(); },
-            child: Text("New Game"),
+            child: Text("New Game",
+              style: TextStyle(fontSize: 20.0),
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ],

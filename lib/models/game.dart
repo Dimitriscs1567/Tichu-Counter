@@ -17,6 +17,33 @@ class Game{
     _addNewRound(points1: points1, points2: points2);
   }
 
+  Game.fromMap(Map<String, dynamic> gameMap){
+    List<Round> tempRounds = [];
+    (gameMap["rounds"] as List).forEach((round) => tempRounds.add(Round.fromMap(round)));
+
+    _name = gameMap["name"];
+    _team1Name = gameMap["team1Name"];
+    _team2Name = gameMap["team2Name"];
+    _rounds = tempRounds;
+    _totalPoints = {...gameMap["totalPoints"]};
+  }
+
+  Map<String, dynamic> toMap(){
+    List<Map<String, dynamic>> roundsMap = [];
+
+    _rounds.forEach((round){
+      roundsMap.add(round.toMap());
+    });
+
+    return {
+      "name": _name,
+      "team1Name": _team1Name,
+      "team2Name": _team2Name,
+      "rounds": roundsMap,
+      "totalPoints": _totalPoints,
+    };
+  }
+
   set name(String name) => _name = name;
 
   String get name => _name;
@@ -61,8 +88,6 @@ class Game{
       _rounds.length + 1,
       _team1Name,
       _team2Name,
-      _rounds.isNotEmpty ? _rounds.last.getRoundState(1, "Points") : points1,
-      _rounds.isNotEmpty ? _rounds.last.getRoundState(2, "Points") : points2,
     ));
   }
 

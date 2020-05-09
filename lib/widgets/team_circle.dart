@@ -171,23 +171,28 @@ class _TeamCircleState extends State<TeamCircle> {
               overscroll.disallowGlow();
               return true;
             },
-            child: ListWheelScrollView(
-              controller: scrollController,
-              itemExtent: size / 2,
-              diameterRatio: 1.2,
-              onSelectedItemChanged: (index){
-                int points = Utils.indexToPoints(index);
-                if(points != data.game.getCurrentRound().getRoundState(widget.team, "Points")){
-                  data.setRoundState(widget.team, "Points", points);
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (scroll){
+                if(scroll is ScrollEndNotification){
+                  int points = Utils.indexToPoints(scrollController.selectedItem);
+                  if(points != data.game.getCurrentRound().getRoundState(widget.team, "Points")){
+                    data.setRoundState(widget.team, "Points", points);
+                  }
                 }
+                return true;
               },
-              children: List.generate(31, (index) => Utils.indexToPoints(index)).map((number){
-                return Center(
-                  child: Text(number.toString(),
-                    style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
-                  ),
-                );
-              },).toList(),
+              child: ListWheelScrollView(
+                controller: scrollController,
+                itemExtent: size / 2,
+                diameterRatio: 1.2,
+                children: List.generate(31, (index) => Utils.indexToPoints(index)).map((number){
+                  return Center(
+                    child: Text(number.toString(),
+                      style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                },).toList(),
+              ),
             ),
           ),
         ),

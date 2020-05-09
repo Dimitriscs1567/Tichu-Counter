@@ -10,7 +10,7 @@ class Data extends PropertyChangeNotifier<String>{
   factory Data(){
     if(_instance == null){
       _instance = Data._internal();
-      _game = Game("", "Team 1", "Team 2", 50, 50);
+      _game = Game("Game", "Team 1", "Team 2", 50, 50);
     }
 
     return _instance;
@@ -25,16 +25,18 @@ class Data extends PropertyChangeNotifier<String>{
 
   void setTotalPoints(bool edit){
     _game.endRound(edit);
-    super.notifyListeners("TotalPoints");
+    super.notifyListeners("TotalPoints Team1 Team2 Points");
   }
 
   void newGame(){
     _game = Game(
-      "",
+      "Game",
       _game.team1Name,
       _game.team2Name,
-      _game.getCurrentRound().getRoundState(1, "Points"),
-      _game.getCurrentRound().getRoundState(2, "Points"),
+      50,
+      50,
     );
+
+    super.notifyListeners("TotalPoints Team1 Team2 Points");
   }
 }
