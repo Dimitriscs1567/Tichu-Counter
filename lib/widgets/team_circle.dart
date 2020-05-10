@@ -22,25 +22,16 @@ class _TeamCircleState extends State<TeamCircle> {
 
   @override
   void initState() {
-
-    data.addListener((String property){
-      bool onEnemy = property.contains("Team${widget.enemyTeam}");
-
-      if(property.contains("Points") && onEnemy){
-        int points = 100 - data.game.getCurrentRound().getRoundState(widget.enemyTeam, 'Points');
-
-        scrollController.animateToItem(
-          Utils.pointsToIndex(points),
-          duration: Duration(milliseconds: 100),
-          curve: Curves.linear,
-        );
-      }
-      else{
-        setState(() {});
-      }
-    });
+    data.addListener(_listener);
 
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    data.removeListener(_listener);
+
+    super.dispose();
   }
 
   @override
@@ -173,11 +164,15 @@ class _TeamCircleState extends State<TeamCircle> {
             },
             child: NotificationListener<ScrollNotification>(
               onNotification: (scroll){
-                if(scroll is ScrollEndNotification){
+                if(scroll is ScrollStartNotification){
+                  Data.canCalculate = false;
+                }
+                else if(scroll is ScrollEndNotification){
                   int points = Utils.indexToPoints(scrollController.selectedItem);
                   if(points != data.game.getCurrentRound().getRoundState(widget.team, "Points")){
                     data.setRoundState(widget.team, "Points", points);
                   }
+                  Data.canCalculate = true;
                 }
                 return true;
               },
@@ -198,5 +193,22 @@ class _TeamCircleState extends State<TeamCircle> {
         ),
       ),
     );
+  }
+
+  void _listener(String property){
+    bool onEnemy = property.contains("Team${widget.enemyTeam}");
+
+    if(property.contains("Points") && onEnemy){
+      int points = 100 - data.game.getCurrentRound().getRoundState(widget.enemyTeam, 'Points');
+
+      scrollController.animateToItem(
+        Utils.pointsToIndex(points),
+        duration: Duration(milliseconds: 100),
+        curve: Curves.linear,
+      );
+    }
+    else{
+      setState(() {});
+    }
   }
 }

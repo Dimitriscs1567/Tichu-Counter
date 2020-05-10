@@ -4,19 +4,22 @@ import 'package:tichucounter/models/game.dart';
 class Data extends PropertyChangeNotifier<String>{
   static Data _instance;
   static Game _game;
+  static bool canCalculate = true;
 
   Data._internal();
 
-  factory Data(){
+  factory Data({Game game}){
     if(_instance == null){
       _instance = Data._internal();
-      _game = Game("Game", "Team 1", "Team 2", 50, 50);
+      _game = game ?? Game("Game", "Team 1", "Team 2", 50, 50);
     }
 
     return _instance;
   }
 
   Game get game => _game;
+
+  set game(Game game) => _game = game;
 
   void setRoundState(int teamNumber, String key, dynamic value){
     _game.getCurrentRound().setRoundState(teamNumber, key, value);
