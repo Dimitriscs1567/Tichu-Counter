@@ -50,8 +50,8 @@ class _HomePageState extends State<HomePage> {
   Widget _mainWidget(){
     return Column(
       children: <Widget>[
-        Expanded(
-          flex: 1,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5.0),
           child: Row(
             children: <Widget>[
               _teamsInfo(1),
@@ -70,17 +70,34 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: <Widget>[
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 20.0),
+                  margin: const EdgeInsets.symmetric(vertical: 15.0),
                   child: _buttonRow(),
                 ),
-                Container(
-                  margin: const EdgeInsets.only(bottom: 10.0),
-                  alignment: Alignment.center,
-                  child: Text("Rounds",
-                    style: TextStyle(fontSize: 22.0),
+                Expanded(
+                  child: Stack(
+                    children: <Widget>[
+                      Image.asset('resources/icons/notesBg.png',
+                        width: MediaQuery.of(context).size.width,
+                        fit: BoxFit.fill,
+                      ),
+                      Column(
+                        children: <Widget>[
+                          Container(
+                            margin: new EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height / 14,
+                              bottom: 10.0,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text("Rounds",
+                              style: TextStyle(fontSize: 22.0),
+                            ),
+                          ),
+                          _history(),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                _history(),
               ],
             ),
           ),
@@ -279,14 +296,14 @@ class _HomePageState extends State<HomePage> {
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Load Game"),
-        content: Text("A game has previously been saved. Do you want to continue this game or start a new one?"),
+        content: Text("Do you want to continue your previous game or start a new one?"),
         actions: <Widget>[
           FlatButton(
             child: Text("Start new game"),
             onPressed: (){Navigator.pop(context, false);},
           ),
           FlatButton(
-            child: Text("Continue saved game"),
+            child: Text("Continue previous game"),
             onPressed: (){Navigator.pop(context, true);},
           ),
         ],
