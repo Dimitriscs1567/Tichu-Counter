@@ -9,13 +9,21 @@ class RoundAsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String invisibleText = '';
+    if(round.number < 10){
+      invisibleText += '0';
+    }
+    if(round.number < 100){
+      invisibleText += '0';
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 3.0),
       child: Row(
         children: <Widget>[
           RichText(
-            text: round.number < 10 ? TextSpan(
-              text:'0',
+            text: TextSpan(
+              text: invisibleText,
               style: TextStyle(fontSize: 20.0, color: Colors.white.withOpacity(0.0)),
               children: <TextSpan>[
                 TextSpan(
@@ -23,11 +31,7 @@ class RoundAsText extends StatelessWidget {
                   style: TextStyle(fontSize: 20.0, color: Colors.black),
                 ),
               ],
-            ):
-            TextSpan(
-              text: round.number.toString() + '.',
-              style: TextStyle(fontSize: 20.0, color: Colors.black),
-            ) ,
+            ),
           ),
           Expanded(
             child: _getScoreText(1),

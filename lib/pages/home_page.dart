@@ -41,21 +41,6 @@ class _HomePageState extends State<HomePage> {
       key: key,
       appBar: AppBar(
         title: Text('Tichu Counter'),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.save),
-            iconSize: 25.0,
-            onPressed: (){
-              Storage.storeGame(data.game).whenComplete((){
-                key.currentState.showSnackBar(SnackBar(
-                  elevation: 10.0,
-                  content: Text("Game Saved"),
-                  duration: Duration(seconds: 3),
-                ));
-              });
-            },
-          )
-        ],
         centerTitle: true,
       ),
       body: _loading ? Center(child: CircularProgressIndicator(),) : _mainWidget(),
@@ -174,6 +159,10 @@ class _HomePageState extends State<HomePage> {
             onPressed: (){
               if(Data.canCalculate){
                 data.setTotalPoints(false);
+                Data.canCalculate = false;
+                Storage.storeGame(data.game).whenComplete((){
+                  Data.canCalculate = true;
+                });
               }
             },
             child: Text("Calculate Round",
@@ -191,6 +180,10 @@ class _HomePageState extends State<HomePage> {
                 ? (){
                     if(Data.canCalculate){
                       data.setTotalPoints(true);
+                      Data.canCalculate = false;
+                      Storage.storeGame(data.game).whenComplete((){
+                        Data.canCalculate = true;
+                      });
                     }
                   }
                 : null,

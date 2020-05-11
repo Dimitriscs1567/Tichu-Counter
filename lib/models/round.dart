@@ -35,7 +35,10 @@ class Round{
     _team2Name = roundMap["team2Name"];
     _team1Score = roundMap["team1Score"];
     _team2Score = roundMap["team2Score"];
-    _roundState = {...roundMap["roundState"]};
+    _roundState = {
+      _team1Name: {...roundMap["roundState"][_team1Name]},
+      _team2Name: {...roundMap["roundState"][_team2Name]},
+    };
   }
 
   Map<String, dynamic> toMap() => {

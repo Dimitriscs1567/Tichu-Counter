@@ -24,6 +24,7 @@ class Storage{
     var db = await database;
     var store = intMapStoreFactory.store("game");
 
+    await store.drop(db);
     await store.add(db, game.toMap());
   }
 
