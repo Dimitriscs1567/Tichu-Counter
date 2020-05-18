@@ -71,8 +71,12 @@ class Game{
       _totalPoints[_team1Name] += _rounds.last.team1Score;
       _totalPoints[_team2Name] += _rounds.last.team2Score;
 
-      getPreviousRound().state = _rounds.last.state;
+      getPreviousRound().state = {
+        _team1Name: {..._rounds.last.state[_team1Name]},
+        _team2Name: {..._rounds.last.state[_team2Name]},
+      };
       getPreviousRound().calculateScores();
+      _rounds.last.cleanState();
     }
     else{
       rounds.last.calculateScores();

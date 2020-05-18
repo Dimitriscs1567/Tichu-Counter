@@ -8,25 +8,7 @@ class Round{
   Map<String, Map<String, dynamic>> _roundState;
 
   Round(this._number, this._team1Name, this._team2Name){
-
-    _roundState = {
-      _team1Name: {
-        "Points": 50,
-        "Tichu": false,
-        "Grand Tichu": false,
-        "Failed Tichu": false,
-        "Failed Grand Tichu": false,
-        "1-2": false,
-      },
-      _team2Name: {
-        "Points": 50,
-        "Tichu": false,
-        "Grand Tichu": false,
-        "Failed Tichu": false,
-        "Failed Grand Tichu": false,
-        "1-2": false,
-      },
-    };
+    cleanState();
   }
 
   Round.fromMap(Map<String, dynamic> roundMap){
@@ -148,5 +130,26 @@ class Round{
     }
 
     return points;
+  }
+
+  void cleanState(){
+    _roundState = {
+      _team1Name: {
+        "Points": 50,
+        "Tichu": false,
+        "Grand Tichu": false,
+        "Failed Tichu": false,
+        "Failed Grand Tichu": false,
+        "1-2": false,
+      },
+      _team2Name: {
+        "Points": 50,
+        "Tichu": false,
+        "Grand Tichu": false,
+        "Failed Tichu": false,
+        "Failed Grand Tichu": false,
+        "1-2": false,
+      },
+    };
   }
 }
